@@ -500,22 +500,9 @@ $(document).on('eventName', 'css selector', function(){
 ```ruby
 $ rails g model Like user:references post:references
 ```
-
 <br>
-
-** [show.erb] **
-ajax로 e.prevent 랑 console창 확인하면서 구현
-
-```javascript
- $(function() {
-    $('#like_button').on('click', function(e) {
-      e.preventDefault();
-      console.log("Like Button Clicked");
-    })
-```
 
 ### 4. 모델의 관계 설정
-<br>
 
 ```ruby
 # references로 like.rb에는 belong_to가 생성되어 있다. 
@@ -526,7 +513,72 @@ has_many :likes
 # user.rb
 has_many :likes
 ```
+<br>
 
+
+### 5. event 설정
+
+**[좋아요 이벤트 발생: show.erb]**
+<br>
+ajax로 e.prevent 랑 console창 확인하면서 구현
+
+```javascript
+ $(function() {
+    $('#like_button').on('click', function(e) {
+      e.preventDefault();
+      console.log("Like Button Clicked");
+    })
+```
+<br>
+
+### 6. ajax를 이용해 event 처리
+
+**[이벤트 처리: show.erb]**
+
+```js
+ $.ajax({
+        method: "POST",
+        url: "<%=like_to_post_path%>"
+      })
+```
+ActionView::MissingTemplate
+
+### 7. missing template 처리
+
+**[새로만들기: like_post.js.erb]**
+
+```js
+alert("좋아요를 눌렀습니다.")
+```
+
+### 8. 좋아요 누르기 상황 설정
+
+**[상황 설정: posts_controller.rb]**
+
+```ruby
+ before_action :set_post, only: [:show, :edit, :update, :destroy, :create_comment, :like_post]
+ 
+  def like_post
+    puts "Like Post Sucess"
+    unless user_signed_in?
+      respond_to do |format|
+        format.js {render 'please_login.js.erb'}
+      end
+    else
+      if Like.where(user_id: current_user.id, post_id: @post.id).first.nil?
+        @result = current_user.likes.create(post_id: @post.id)
+        puts "좋아요"
+      else
+        @result = current_user.likes.find(post_id: @post_id).destroy
+        puts "좋아요 취소"
+      end
+      puts "test"
+      puts @result
+    end
+ 
+```
+1. 상황설정에 따라 puts에 대한 값이 나오는지 확인
+2. 
 
 
 **[ajax작성]**
