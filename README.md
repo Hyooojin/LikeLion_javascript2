@@ -25,8 +25,8 @@ jQeury사이트: [http://jquery.com/](http://jquery.com/)
 Rails에서 jQuery와 ajax를 이용해 CRUD를 구현한다.
 
 ## CRUD 기본 설정
----------------------
-** gemfile 설정**
+
+**gemfile 설정**
 ```ruby
 # gem file
 gem 'devise'
@@ -34,7 +34,7 @@ gem 'faker'
 gem 'kaminari'
 gem 'bootstrap-sass'
 ```
-** controller, model 설정 ** 
+**controller, model 설정** 
 
 ```ruby
 $ rails g devise:install
