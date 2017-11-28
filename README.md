@@ -157,19 +157,18 @@ Completed 500 Internal Server Error in 9ms (ActiveRecord: 0.0ms)
       console.log(contents)
     });
   })
-
-  
 </script>
 ```
-##3. ajax
+## 3. ajax
 
-#### Q1. 댓글 달기 + ajax로 구현하기
+### Q1. 댓글 달기 + ajax로 구현하기
 1. input태그에 값(댓글내용)을 입력한다. 
 	(0) submit 버튼을 클릭한다.(submit 이벤트 발생)
 	(1) input태그에 있는 값을 가져온다. 
 	(2) 값이 유효한지 확인한다. (빈칸인지 아닌지)
 	(3) 값이 없으면 값을 넣으라는 안내메시지를 뿌린다. 
 2. ajax로 처리한다. 
+	(0) 현재 글을 
 3. 서버에서 처리가 완료되면 화면에 댓글을 출력한다. 
 
 * ajax => 서버랑 통신
@@ -211,5 +210,110 @@ Completed 500 Internal Server Error in 22ms (ActiveRecord: 0.0ms)
 ActionView::MissingTemplate
 ```
 
+#### 데이터 넘기기
+
+* show.erb
+
+```ruby
+      $.ajax({
+        url: "<%=create_comment_to_post_path%>",
+        method: "POST",
+        data: {body: contents}
+      })
+```
+
+* posts_controller.rb
+
+```ruby
+  def create_comment
+    puts params[:body]
+  end
+```
+1. templete missing에러 잡기
 
 
+* view/posts/create_comment.js.erb
+
+```javascript
+# create_comment.js.erb
+alert("댓글이 등록됨");
+```
+
+
+
+* posts_controller.erb
+```ruby
+before_action :set_post, only: [:show, :edit, :update, :destroy, :create_comment]
+
+  def create_comment
+    # puts params[:body]
+    @c = @post.commnets.create(body: params[:body]) # 와일드카드를 쓰고 있으므로 id도 같이 넘어온다. 
+  end
+```
+* javascript에서 페이지 넘기는 방법
+
+```ruby
+  def create_comment
+    # puts params[:body]
+    unless user_signed_in?
+      respond_to do |format|
+        format.js {render 'please_login.js.erb'}
+      end
+    end
+    @c = @post.comments.create(body: params[:body]) # 와일드카드를 쓰고 있으므로 id도 같이 넘어온다. 
+  end
+```
+* please_login.js.erb
+
+```html
+if(confirm("로그인이 필요합니다. \n 로그인 페이졸 이동하시겠습니까?"))
+location.href = "<%=new_user_session_path%>"
+```
+
+1. @post를 쓸 수 있도록 한다. 
+2. redirect_to를 쓸 수 없다. 
+3. user가 로그인을 안했을 경우, respond_to do |format|을 이용해서 다른 페이지로 넘긴다. 
+4. please_login.js.erb 를 만들어준다. 
+
+* show.erb
+```html
+<table class="table", id="comment_table">
+  <thead>
+      <tr>
+        <th>댓글</th>
+      </tr>
+  </thead>
+  <tbody>
+    <% @post.comments.each do |p|%>
+      <tr>
+          <td><%= p.body %></td>
+      </tr>
+    <% end %>
+  </tbody>  
+</table>
+
+```
+
+
+```javascript
+alert("댓글이 등록됨");
+$('#body').val("");
+$('#comment_table tbody').append(
+`<tr>
+    <td><%= @c.body%></td>
+</tr>`);
+```
+append | prepend
+
+* 기존에 입력되었던 댓글들 추가
+
+```html
+  <tbody>
+    <% @post.comments.each do |p|%>
+      <tr>
+          <td><%= p.body %></td>
+      </tr>
+    <% end %>
+  </tbody>  
+```
+<% @post.comments.each do |p|%> |  <% @post.comments.reverse.each do |p|%>

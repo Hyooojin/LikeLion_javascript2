@@ -1,5 +1,5 @@
 class PostsController < ApplicationController
-  before_action :set_post, only: [:show, :edit, :update, :destroy]
+  before_action :set_post, only: [:show, :edit, :update, :destroy, :create_comment]
 
   # GET /posts
   # GET /posts.json
@@ -62,7 +62,13 @@ class PostsController < ApplicationController
   end
 
   def create_comment
-    puts "create_commnet"
+    # puts params[:body]
+    unless user_signed_in?
+      respond_to do |format|
+        format.js {render 'please_login.js.erb'}
+      end
+    end
+    @c = @post.comments.create(body: params[:body]) # 와일드카드를 쓰고 있으므로 id도 같이 넘어온다. 
   end
 
 
