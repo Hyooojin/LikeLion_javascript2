@@ -191,7 +191,8 @@ Completed 500 Internal Server Error in 3ms (ActiveRecord: 0.0ms)
 e.preventDefault를 하지 않으면, action에 의해 다음 page로 넘어가는데, 다음 page로 넘어가지 않게 한다.
   <br>
   <br>
-### 3. `action`이 다음페이지로 넘어가지 않고, console창에서 내용(value)확인
+
+### 3. action이 다음페이지로 넘어가지 않고, console창에서 내용(value)확인
 **[e.preventDefault를 이용: show.erb]**
 <br>
 [form#comment, context: document, selector: "#comment"]
@@ -212,6 +213,8 @@ e.preventDefault를 하지 않으면, action에 의해 다음 page로 넘어가�
 ```
 <br>
 <br>
+
+
 # 3. ajax
 ajax는 page의 과부하를 주지않고, 작성할 수 있게 해준다. 
 <br>
