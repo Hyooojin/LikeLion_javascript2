@@ -11,10 +11,11 @@ document.getElementById("divId"); document.getElementsByClassName("className"); 
 ```
 <br>
 **[jQuery]**
-```jquery
-$("#divId"); $(".className"); $("input");
 
+```javascript
+$("#divId"); $(".className"); $("input");
 ```
+
 출처: [왜 jQuery를 사용하는가?](출처: http://unikys.tistory.com/300 [All-round programmer])
 <br>
 jQeury사이트: [http://jquery.com/](http://jquery.com/)
