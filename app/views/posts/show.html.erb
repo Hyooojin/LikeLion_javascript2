@@ -10,5 +10,32 @@
   <%= @post.content %>
 </p>
 
+
+<%=form_tag create_comment_to_post_path, id: "comment" do%>
+  <%=text_field_tag :body%>
+  <%=submit_tag "댓글달기"%>
+<% end %>
+
+
 <%= link_to 'Edit', edit_post_path(@post) %> |
 <%= link_to 'Back', posts_path %>
+
+<script>
+
+  $(function() {
+    var form = $('#comment');
+    // console.log(form);
+    form.on('submit', function(e) {
+      e.preventDefault();
+      // console.log("haha");
+      var contents = $('#body').val();
+      console.log(contents);
+      $.ajax({
+        url: "<%=create_comment_to_post_path%>",
+        method: "POST"
+      })
+    });
+  })
+
+  
+</script>

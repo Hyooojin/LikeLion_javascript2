@@ -1,5 +1,6 @@
 # rails CRUD & jQuery 
 
+## 1. CRUD 설정
 
 ```ruby
 $ rails g devise:install
@@ -63,6 +64,152 @@ gem 'bootstrap-sass'
 ```
 
 
+## 2. comment 창 
+
+* comment를 달 수 있도록 한다. 
+```ruby
+  resources :posts do
+    member do
+      post '/create_comment' => 'posts#create_comment', as: 'create_comment_to'
+    end
+  end
+```
+rake routes 확인 
+
+```ruby
+# posts_controller.rb
+  def create_comment
+    puts "create_commnet"
+  end
+```
+```html
+# show.erb
+<%=form_tag create_comment_to_post_path do%>
+  <%=text_field_tag :body%>
+  <%=submit_tag "댓글달기"%>
+<% end %>
+```
+
+* **Template is missing**
+  * comment창을 확인하면, create_comment를 볼 수 있으면 된다. 
+
+
+```ruby
+ActiveRecord::SchemaMigration Load (0.2ms)  SELECT "schema_migrations".* FROM "schema_migrations"
+Processing by PostsController#show as HTML
+  Parameters: {"id"=>"1"}
+  Post Load (0.3ms)  SELECT  "posts".* FROM "posts" WHERE "posts"."id" = ? LIMIT 1  [["id", 1]]
+  Rendered posts/show.html.erb within layouts/application (4.3ms)
+Completed 200 OK in 421ms (Views: 383.1ms | ActiveRecord: 0.8ms)
+
+
+Started POST "/posts/1/create_comment" for 203.246.196.65 at 2017-11-28 01:16:41 +0000
+Cannot render console from 203.246.196.65! Allowed networks: 127.0.0.1, ::1, 127.0.0.0/127.255.255.255
+Processing by PostsController#create_comment as HTML
+  Parameters: {"utf8"=>"✓", "authenticity_token"=>"mgzTBaGOnM+vzqVAVQPOJncx91DrnfSWhqjQ79qd3jYrgvIJcJRUaTL0W+Q7nQw+r3eatQxZFkBC6DLcy2L4oA==", "body"=>"aaaa", "commit"=>"댓글달 기", "id"=>"1"}
+create_commnet
+Completed 500 Internal Server Error in 9ms (ActiveRecord: 0.0ms)
+```
+* jQuery사용하기 위한 id 설정
+
+```ruby
+<%=form_tag create_comment_to_post_path, id: "comment" do%>
+  <%=text_field_tag :body%>
+  <%=submit_tag "댓글달기"%>
+<% end %>
+```
+* comment 창에 jQuery 활용
+
+```javascript
+<script>
+
+  $(function() {
+    var form = $('#comment');
+    // console.log(form);
+    form.on('click', function() { 
+      console.log("haha");
+    });
+  })
+
+  
+</script>
+```
+1. 코멘트 창을 클릭할 때마다 haha가 늘어나는 것을 확인할 수 있다. 
+2. form event
+	* click -> submit
+	* e (=event)
+	* e.preventDefault()
+		* event의 결과는 필요없다. 
+		* 버튼을 누르는 것까지만 하고, url로 날라가는 단계는 생략할 수 있다.
+		* 더 이상 templete missing이 일어나지 않는다. 
+
+* e.preventDefault
+```javascript
+<script>
+
+  $(function() {
+    var form = $('#comment');
+    // console.log(form);
+    form.on('submit', function(e) {
+      e.preventDefault();
+      // console.log("haha");
+      var contents = $('#body').val();
+      console.log(contents)
+    });
+  })
+
+  
+</script>
+```
+##3. ajax
+
+#### Q1. 댓글 달기 + ajax로 구현하기
+1. input태그에 값(댓글내용)을 입력한다. 
+	(0) submit 버튼을 클릭한다.(submit 이벤트 발생)
+	(1) input태그에 있는 값을 가져온다. 
+	(2) 값이 유효한지 확인한다. (빈칸인지 아닌지)
+	(3) 값이 없으면 값을 넣으라는 안내메시지를 뿌린다. 
+2. ajax로 처리한다. 
+3. 서버에서 처리가 완료되면 화면에 댓글을 출력한다. 
+
+* ajax => 서버랑 통신
+```javascript
+$.ajax({
+        url: "<%=create_comment_to_post_path%>",
+        method: "POST"
+      })
+```
+1. 이렇게만 하면 missing templete에러가 발생한다. 
+2. 500에러
+3. 원래는 서버랑 통신을 하지 않고 있어서, error가 나지 않았지만, ajax를 쓰면서 서버랑 통신을 연결하면서 error가 발생하게 된다.
+```ruby
+500 (Internal Server Error)
+```
+* error_message확인
+```ruby
+Post Load (0.1ms)  SELECT  "posts".* FROM "posts" WHERE "posts"."id" = ? LIMIT 1  [["id", 1]]
+  Rendered posts/show.html.erb within layouts/application (1.5ms)
+Completed 200 OK in 22ms (Views: 20.5ms | ActiveRecord: 0.1ms)
+
+
+Started GET "/posts/1" for 203.246.196.65 at 2017-11-28 01:43:34 +0000
+Cannot render console from 203.246.196.65! Allowed networks: 127.0.0.1, ::1, 127.0.0.0/127.255.255.255
+Processing by PostsController#show as HTML
+  Parameters: {"id"=>"1"}
+  Post Load (0.2ms)  SELECT  "posts".* FROM "posts" WHERE "posts"."id" = ? LIMIT 1  [["id", 1]]
+  Rendered posts/show.html.erb within layouts/application (2.2ms)
+Completed 200 OK in 24ms (Views: 23.0ms | ActiveRecord: 0.2ms)
+
+
+Started POST "/posts/1/create_comment" for 203.246.196.65 at 2017-11-28 01:43:38 +0000
+Cannot render console from 203.246.196.65! Allowed networks: 127.0.0.1, ::1, 127.0.0.0/127.255.255.255
+Processing by PostsController#create_comment as */*
+  Parameters: {"id"=>"1"}
+create_commnet
+Completed 500 Internal Server Error in 22ms (ActiveRecord: 0.0ms)
+
+ActionView::MissingTemplate
+```
 
 
 
