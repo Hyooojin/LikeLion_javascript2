@@ -556,23 +556,29 @@ alert("좋아요를 눌렀습니다.")
 **[상황 설정: posts_controller.rb]**
 
 ```ruby
- before_action :set_post, only: [:show, :edit, :update, :destroy, :create_comment, :like_post]
+  before_action :set_post, only: [:show, :edit, :update, :destroy, :create_comment, :like_post]
  
   def like_post
-    puts "Like Post Sucess"
+    # puts "Like Post Success"
     unless user_signed_in?
       respond_to do |format|
         format.js {render 'please_login.js.erb'}
       end
     else
       if Like.where(user_id: current_user.id, post_id: @post.id).first.nil?
+        # 좋아요 누르지 않은 상태에 대한 실행문
+        # 좋아요를 만들어준다.
         @result = current_user.likes.create(post_id: @post.id)
-        puts "좋아요"
-      else
-        @result = current_user.likes.find(post_id: @post_id).destroy
-        puts "좋아요 취소"
+        # puts "좋아요 누름"
+      else 
+        # 좋아요를 누른 상태에 대한 실행문
+        # 기존의 좋아요를 삭제한다. 
+        
+        @result = current_user.likes.find_by(post_id: @post.id).destroy
+        # puts "좋아요 취소"    
       end
-      puts "test"
+      # puts ("test가 나오나 안나오나")
+      @result = @result.frozen?
       puts @result
     end
  
