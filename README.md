@@ -1,7 +1,6 @@
 # jQuery & ajax on Rails
 
-# 1.jQuery
-## **jQuery** ?
+# jQuery
 jQuery는 가볍고, DOM탐색이나 이벤트, 애니메이션, ajax등을 활용할 때 유용하게 사용할 수 있는 라이브러리이다.
 <br>
 
@@ -45,7 +44,7 @@ $ rails g devise user
 $ rails g model comments post:references body:text
 $ rake db:migrate
 ```
-** controller, model 관계 설정 ** 
+**controller, model 관계 설정** 
 model관의 관계는 post랑 comment
 
 ```ruby
@@ -56,7 +55,7 @@ has_many :comments
 belongs_to :post
 ```
 
-** route 설정 **
+**route 설정**
 
 ```ruby
 # routes.rb
@@ -65,14 +64,14 @@ root 'posts#index'
 
 ```
 
-** bootstrap 설정 **
+**bootstrap 설정**
 
 ```ruby
 # application.scss (css -> scss)
 @import 'bootstrap';
 ```
 
-** 기본 view 설정 ** 
+**기본 view 설정** 
 
 ```ruby
 # views/application.erb
@@ -90,15 +89,15 @@ root 'posts#index'
 ```
 
 # 구현
-본격적으로 jQuery와 ajax를 이용하여 댓글달기 기능을 구현한다.
+본격적으로 jQuery와 ajax를 이용하여 댓글달기 기능을 구현한다. 
 
-# 1. 댓글달기 기능 
+## 댓글달기 기능
 
-## 1. 댓글달기 기본 설정
+## 1. 댓글달기 기능 기본 설정
 
 ### 1. 댓글을 달 수 있는 veiw 설정, form_tag로 comment를 달 수 있는 창 만들기.
 
-** [View 설정: show.erb] ** 
+**[View 설정: show.erb]** 
 
 ```html
 # show.erb
@@ -108,7 +107,7 @@ root 'posts#index'
 <% end %>
 ```
 
-** [컨트롤러 설정: posts_controller.rb] **
+**[컨트롤러 설정: posts_controller.rb]**
 ```ruby
 # posts_controller.rb
   def create_comment
@@ -133,26 +132,16 @@ rake routes 확인해 보면, creat_comment_to_post_path로 prefix가 만들어�
 <br>
 **Template is missing** => comment창을 확인하면, create_comment는 볼 수 있다. 
 <br>
+
 <br>
 ### 3. Template error를 jQuery와 ajax로 차근차근 고쳐나가기
 <br>
 <br>
-**<error>**
-```ruby
-ActiveRecord::SchemaMigration Load (0.2ms)  SELECT "schema_migrations".* FROM "schema_migrations"
-Processing by PostsController#show as HTML
-  Parameters: {"id"=>"1"}
-  Post Load (0.3ms)  SELECT  "posts".* FROM "posts" WHERE "posts"."id" = ? LIMIT 1  [["id", 1]]
-  Rendered posts/show.html.erb within layouts/application (4.3ms)
-Completed 200 OK in 421ms (Views: 383.1ms | ActiveRecord: 0.8ms)
+**[error]**
 
-
-Started POST "/posts/1/create_comment" for 203.246.196.65 at 2017-11-28 01:16:41 +0000
-Cannot render console from 203.246.196.65! Allowed networks: 127.0.0.1, ::1, 127.0.0.0/127.255.255.255
-Processing by PostsController#create_comment as HTML
-  Parameters: {"utf8"=>"✓", "authenticity_token"=>"mgzTBaGOnM+vzqVAVQPOJncx91DrnfSWhqjQ79qd3jYrgvIJcJRUaTL0W+Q7nQw+r3eatQxZFkBC6DLcy2L4oA==", "body"=>"aaaa", "commit"=>"댓글달 기", "id"=>"1"}
-create_commnet
-Completed 500 Internal Server Error in 9ms (ActiveRecord: 0.0ms)
+```
+create_comment
+Completed 500 Internal Server Error in 3ms (ActiveRecord: 0.0ms)
 ```
 <br>
 
@@ -161,7 +150,8 @@ Completed 500 Internal Server Error in 9ms (ActiveRecord: 0.0ms)
 ### 1. jQuery 사용하기 위한 id 설정
 <br>
 
-** [jQuery를 위한 설정: show.erb] ** 
+**[jQuery를 위한 설정: show.erb]** 
+
 ```html
 <%=form_tag create_comment_to_post_path, id: "comment" do%>
   <%=text_field_tag :body%>
@@ -172,7 +162,7 @@ Completed 500 Internal Server Error in 9ms (ActiveRecord: 0.0ms)
 알맞는 기능을 구현되고 있는지, 인터넷창에서 콘솔창으로 로그를 확인할 수 있다.
 <br>
 <br>
-** [jQuery를 활용한 자바스크립트 작성 : show.erb] ** 
+**[jQuery를 활용한 자바스크립트 작성 : show.erb]** 
 
 ```javascript
 <script>
@@ -187,8 +177,9 @@ Completed 500 Internal Server Error in 9ms (ActiveRecord: 0.0ms)
 
 </script>
 ```
-1. 코멘트 창을 클릭할 때마다 haha가 늘어나는 것을 확인할 수 있다. 
-2. form event
+1. [form#comment, context: document, selector: "#comment"]
+2. 코멘트 창에 커서를 둘 때마다 "haha" 가 늘어나는 것을 확인할 수 있다. 
+3. form event
   * click -> submit
   * e (=event)
   * e.preventDefault()
@@ -196,11 +187,14 @@ Completed 500 Internal Server Error in 9ms (ActiveRecord: 0.0ms)
     * 버튼을 누르는 것까지만 하고, url로 날라가는 단계는 생략할 수 있다.
     * 더 이상 templete missing이 일어나지 않는다. 
 
-* e.preventDefault <br>
-  e.preventDefault를 하지 않으면, action에 의해 다음 page로 넘어가는데, 다음 page로 넘어가지 않게 한다.
+4. e.preventDefault <br>
+e.preventDefault를 하지 않으면, action에 의해 다음 page로 넘어가는데, 다음 page로 넘어가지 않게 한다.
   <br>
   <br>
-### 3. content확인 : show.erb 
+### 3. `action`이 다음페이지로 넘어가지 않고, console창에서 내용(value)확인
+**[e.preventDefault를 이용: show.erb]**
+<br>
+[form#comment, context: document, selector: "#comment"]
 
 ```javascript
 <script>
