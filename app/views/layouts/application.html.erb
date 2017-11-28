@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Workspace</title>
+  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%= csrf_meta_tags %>
+</head>
+<body>
+  <% if user_signed_in? %>
+    <%=link_to "SIGN OUT", destroy_user_session_path, method: :delete, : ""data: {confirm: "로그아웃 하시겠습니까?"}%>
+  <% else %>
+    <%=link_to "SIGN IN", new_user_session_path, data: {confirm: "로그인 하시겠습니까?"}%>
+  <% end %>
+  <%=link_to "HOME", root_path %>
+  
+<div class="container">
+  <%= yield %>
+</div>
+
+</body>
+</html>
