@@ -66,6 +66,27 @@ gem 'bootstrap-sass'
 
 ## 2. comment 창 
 
+* from_tag로 comment를 달 수 있는 창을 만든다. 
+
+```html
+# show.erb
+<%=form_tag create_comment_to_post_path do%>
+  <%=text_field_tag :body%>
+  <%=submit_tag "댓글달기"%>
+<% end %>
+```
+path를 설정해주기 위해서는 route.rb에서 작업이 필요하다. 
+<br>
+* posts_controller.rb
+```ruby
+# posts_controller.rb
+  def create_comment
+    puts "create_comment"
+  end
+```
+
+webpage에서 console창 확인
+<br>
 * comment를 달 수 있도록 한다. 
 ```ruby
   resources :posts do
@@ -76,19 +97,8 @@ gem 'bootstrap-sass'
 ```
 rake routes 확인 
 
-```ruby
-# posts_controller.rb
-  def create_comment
-    puts "create_commnet"
-  end
-```
-```html
-# show.erb
-<%=form_tag create_comment_to_post_path do%>
-  <%=text_field_tag :body%>
-  <%=submit_tag "댓글달기"%>
-<% end %>
-```
+
+
 
 * **Template is missing**
   * comment창을 확인하면, create_comment를 볼 수 있으면 된다. 
@@ -110,6 +120,7 @@ Processing by PostsController#create_comment as HTML
 create_commnet
 Completed 500 Internal Server Error in 9ms (ActiveRecord: 0.0ms)
 ```
+<br>
 * jQuery사용하기 위한 id 설정
 
 ```ruby
@@ -136,12 +147,12 @@ Completed 500 Internal Server Error in 9ms (ActiveRecord: 0.0ms)
 ```
 1. 코멘트 창을 클릭할 때마다 haha가 늘어나는 것을 확인할 수 있다. 
 2. form event
-	* click -> submit
-	* e (=event)
-	* e.preventDefault()
-		* event의 결과는 필요없다. 
-		* 버튼을 누르는 것까지만 하고, url로 날라가는 단계는 생략할 수 있다.
-		* 더 이상 templete missing이 일어나지 않는다. 
+  * click -> submit
+  * e (=event)
+  * e.preventDefault()
+    * event의 결과는 필요없다. 
+    * 버튼을 누르는 것까지만 하고, url로 날라가는 단계는 생략할 수 있다.
+    * 더 이상 templete missing이 일어나지 않는다. 
 
 * e.preventDefault
 ```javascript
@@ -160,15 +171,16 @@ Completed 500 Internal Server Error in 9ms (ActiveRecord: 0.0ms)
 </script>
 ```
 ## 3. ajax
+* page의 과부하를 주지않고, 작성할 수 있다. 
 
 ### Q1. 댓글 달기 + ajax로 구현하기
 1. input태그에 값(댓글내용)을 입력한다. 
-	(0) submit 버튼을 클릭한다.(submit 이벤트 발생)
-	(1) input태그에 있는 값을 가져온다. 
-	(2) 값이 유효한지 확인한다. (빈칸인지 아닌지)
-	(3) 값이 없으면 값을 넣으라는 안내메시지를 뿌린다. 
+  (0) submit 버튼을 클릭한다.(submit 이벤트 발생)
+  (1) input태그에 있는 값을 가져온다. 
+  (2) 값이 유효한지 확인한다. (빈칸인지 아닌지)
+  (3) 값이 없으면 값을 넣으라는 안내메시지를 뿌린다. 
 2. ajax로 처리한다. 
-	(0) 현재 글을 
+  (0) 현재 글을 
 3. 서버에서 처리가 완료되면 화면에 댓글을 출력한다. 
 
 * show.erb => ajax => 서버랑 통신
@@ -327,9 +339,97 @@ append | prepend
 2. submit 이벤트가 발생했을 경우에
 3. form태그 동작하지 않게 하기!
 4. input태그 안에 있는 값 가져오기
-	(1) 빈킨인 경우 알림주기
+  (1) 빈킨인 경우 알림주기
 5. jQuery ajax를 이용해서 원하는 url로 데이터 보내기
-	(1) 로그인하지 않은 경우 알림주기
+  (1) 로그인하지 않은 경우 알림주기
 6. 서버에서 댓글 등록하기
 7. 댓글이 등록되었다고 알림주기
 8. 페이지 refresh 없이 댓글 이어주기
+
+
+## 5. 좋아요
+
+```javascript
+$('css selector').on('eventName', function() {
+  
+});
+
+$(document).on('eventName', 'css selector', function(){
+  
+});
+
+```
+### Q3. 좋아요 버튼 + ajax구현
+1. 좋아요 버튼을 누른다. 
+2. 버튼을 누른경우
+	(1) 기존에 좋아요를 이미 누른 경우
+	(2) 기존에 좋아요를 누르지 않은 경우
+3. 이미 누른 경우
+	(1) 좋아요 삭제
+	(2) 
+
+4. 
+
+* show.erb => 좋아요 버튼 만들기
+```html
+<%=link_to 'Like', like_to_post_path, class: "btn btn-info", id: "like_button" %>
+```
+<br>
+* routes.rb
+```ruby
+ post '/like_post' => 'posts#like_post', as: 'like_to'
+```
+<br>
+* Like 모델 만들기
+
+```ruby
+$ rails g model Like user:references post:references
+```
+<br>
+* show.erb => ajax로 e.prevent 랑 console창 확인하면서 구현
+
+```javascript
+ $(function() {
+    
+    $('#like_button').on('click', function(e) {
+      e.preventDefault();
+      console.log("Like Button Clicked");
+    })
+```
+
+<br>
+모델관계 설정
+```ruby
+# references로 like.rb에는 belong_to가 생성되어 있다. 
+
+# post.rb
+has_many :likes
+
+# user.rb
+has_many :likes
+```
+
+
+
+```javascript
+
+```
+
+```ruby
+  def like_post
+    puts "Like Post Success"
+  end
+```
+
+### ajax작성
+
+```
+ORM 객체 == DB Row
+Like.create => DH Row ++ ;
+like.destroy => DB Row -- ;
+@post.destroy
+frozen =.
+
+
+
+```

@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   resources :posts do
     member do
       post '/create_comment' => 'posts#create_comment', as: 'create_comment_to'
+      post '/like_post' => 'posts#like_post', as: 'like_to'
     end
   end
   # The priority is based upon order of creation: first created -> highest priority.

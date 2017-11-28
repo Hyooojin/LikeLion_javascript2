@@ -12,13 +12,19 @@
 
 
 <%=form_tag create_comment_to_post_path, id: "comment" do%>
-  <%=text_field_tag :body%>
+  <%=text_field_tag "comment[body]"%>
   <%=submit_tag "댓글달기"%>
 <% end %>
 
 
-<%= link_to 'Edit', edit_post_path(@post) %> |
-<%= link_to 'Back', posts_path %>
+<%= link_to 'Edit', edit_post_path(@post), class: "btn btn-warning" %>
+<%= link_to 'Back', posts_path, class: "btn btn-success" %>
+<% if @like %>
+  <%=link_to "Like", like_to_post_path, class: "btn btn-info", id: "like_button" %>
+<% else %>
+  <%=link_to "DisLike", like_to_post_path, class: "btn btn-danger", id: "like_button" %>
+<% end %>
+<span id='like_count'><%=@post.likes.count%></span>
 
 <table class="table", id="comment_table">
   <thead>
@@ -39,17 +45,29 @@
 <script>
 
   $(function() {
+    $('#like_button').on('click', function(e) {
+      e.preventDefault();
+      console.log("Like Button Clicked");
+      $.ajax({
+        method: "POST",
+        url: "<%= like_to_post_path %>"
+      })
+    })
+    
+    
     var form = $('#comment');
     // console.log(form);
     form.on('submit', function(e) {
       e.preventDefault();
       // console.log("haha");
-      var contents = $('#body').val();
+      var contents = form.serialize();      /*$('#body').val();*/
+      // var contents = $("#comment_body").val();
       console.log(contents);
       $.ajax({
         url: "<%=create_comment_to_post_path%>",
         method: "POST",
-        data: {body: contents}
+        data: contents
+        // data: {body: contents}
       })
     });
   })
