@@ -97,7 +97,7 @@ root 'posts#index'
 # [구현]
 본격적으로 jQuery와 ajax를 이용하여 댓글달기 기능을 구현한다. 
 
-## 댓글달기 기능
+# 댓글달기 기능
 
 ## 1. 댓글달기 기능 기본 설정
 
@@ -349,15 +349,22 @@ before_action :set_post, only: [:show, :edit, :update, :destroy, :create_comment
         format.js {render 'please_login.js.erb'}
       end
     end
-    @c = @post.comments.create(body: params[:body]) # 와일드카드를 쓰고 있으므로 id도 같이 넘어온다. 
+    @c = @post.comments.create(body: params[:body]) 
   end
 ```
+
+**[error]**
+
+```
+ActionView::MissingTemplate (Missing template posts/please_login.js.erb, application/please_login.js.erb
+```
 <br>
+
 please_login.js.erb를 만들어준다.
 
-** [please_login.js.erb]**
+**[missing template 해결: please_login.js.erb]**
 
-```html
+```js
 if(confirm("로그인이 필요합니다. \n 로그인 페이지로 이동하시겠습니까?"))
 location.href = "<%=new_user_session_path%>"
 ```
@@ -368,7 +375,9 @@ location.href = "<%=new_user_session_path%>"
 4. please_login.js.erb 를 만들어준다. 
 
 ### 5. 인터넷 창에서 데이터 확인
-** [view 깔끔하게: show.erb]**
+
+**[해당 페이지에서 데이터를 직접 확인: show.erb]**
+
 ```html
 <table class="table", id="comment_table">
   <thead>
@@ -387,18 +396,25 @@ location.href = "<%=new_user_session_path%>"
 
 ```
 
-**[댓글 추가: create_comment.js.erb]**
-```javascript
-alert("댓글이 등록됨");
+이럴경우 계속 새로고침을 눌러줘야 댓글이 추가되는 것을 볼 수 있다. 
+
+참고: [HTML 표 작성](https://pat.im/209)
+
+**[새로고침 없이 댓글 추가: create_comment.js.erb]**
+
+```js
+alert("댓글이 등록되었습니다.")
 $('#body').val("");
 $('#comment_table tbody').append(
 `<tr>
     <td><%= @c.body%></td>
 </tr>`);
 ```
-append | prepend
+append | prepend <br>
+* prepend를 사용하면 최근에 단 댓글을 위에 달리게 할 수 있다. 
+<br>
 
-** [기존에 입력되었던 댓글들 추가: show.erb]**
+**[기존에 입력되었던 댓글들 추가: show.erb]**
 
 ```html
   <tbody>
@@ -411,21 +427,38 @@ append | prepend
 ```
 <% @post.comments.each do |p|%> |  <% @post.comments.reverse.each do |p|%>
 
-## 2. ajax를 위한 수도코드
+
+### 6. ajax를 위한 수도코드
 ### Q2. 댓글 구현하기(ajax를  통해서 )
 1. form태그 안에 input 태그 만들기
 2. submit 이벤트가 발생했을 경우에
 3. form태그 동작하지 않게 하기!
 4. input태그 안에 있는 값 가져오기
-  (1) 빈킨인 경우 알림주기
+* (1) 빈킨인 경우 알림주기
 5. jQuery ajax를 이용해서 원하는 url로 데이터 보내기
-  (1) 로그인하지 않은 경우 알림주기
+* (1) 로그인하지 않은 경우 알림주기
 6. 서버에서 댓글 등록하기
 7. 댓글이 등록되었다고 알림주기
 8. 페이지 refresh 없이 댓글 이어주기
 
 
-## 3. 좋아요 기능 구현
+# 좋아요 기능
+
+## 1. 좋아요 기능 기본 설정
+
+### 1. 수도코드 작성
+
+### Q3. 좋아요 버튼 + ajax구현
+1. 좋아요 버튼을 누른다. 
+2. 버튼을 누른경우
+* (1) 기존에 좋아요를 이미 누른 경우
+* (2) 기존에 좋아요를 누르지 않은 경우
+3. 이미 누른 경우
+* (1) 좋아요 삭제
+* (2) 
+<br>
+
+**jQuery 여러 사용법**
 
 ```javascript
 $('css selector').on('eventName', function() {
@@ -433,53 +466,55 @@ $('css selector').on('eventName', function() {
 });
 
 $(document).on('eventName', 'css selector', function(){
-  
+
 });
-
 ```
-### Q3. 좋아요 버튼 + ajax구현
-1. 좋아요 버튼을 누른다. 
-2. 버튼을 누른경우
-  (1) 기존에 좋아요를 이미 누른 경우
-  (2) 기존에 좋아요를 누르지 않은 경우
-3. 이미 누른 경우
-  (1) 좋아요 삭제
-  (2) 
 
-4. ​
+### 2. 좋아요 버튼! view 작성
 
-### 1. 좋아요 버튼! 
-
-** [좋아요 버튼 만들기: show.erb]**
+**[좋아요 버튼 만들기: show.erb]**
 
 ```html
 <%=link_to 'Like', like_to_post_path, class: "btn btn-info", id: "like_button" %>
 ```
 <br>
-** [routes.rb] **
+
+**[like_to의 prefix 설정: routes.rb]**
+
 ```ruby
  post '/like_post' => 'posts#like_post', as: 'like_to'
 ```
 <br>
-### 2. 좋아요 모델 만들기
-**[Like 모델 만들기] **
+
+**[컨트롤러 설정: posts_controller.rb]**
+
+```ruby
+  def like_post
+    puts "Like Post Success"
+  end
+```
+### 3. 좋아요 모델 만들기
+
+**[Like 모델 만들기]**
 
 ```ruby
 $ rails g model Like user:references post:references
 ```
+
 <br>
+
 ** [show.erb] **
 ajax로 e.prevent 랑 console창 확인하면서 구현
 
 ```javascript
  $(function() {
-    
     $('#like_button').on('click', function(e) {
       e.preventDefault();
       console.log("Like Button Clicked");
     })
 ```
-### 3. 모델 관계 설정
+
+### 4. 모델의 관계 설정
 <br>
 
 ```ruby
@@ -494,17 +529,8 @@ has_many :likes
 
 
 
-```javascript
-
-```
-
-```ruby
-  def like_post
-    puts "Like Post Success"
-  end
-```
-
-### ajax작성
+**[ajax작성]**
+<br>
 
 ```
 ORM 객체 == DB Row
@@ -512,7 +538,4 @@ Like.create => DH Row ++ ;
 like.destroy => DB Row -- ;
 @post.destroy
 frozen =.
-
-
-
 ```
