@@ -203,7 +203,6 @@ e.preventDefault를 하지 않으면, action에 의해 다음 page로 넘어가�
 
 **[e.preventDefault를 이용: show.erb]**
 
-<br>
 [form#comment, context: document, selector: "#comment"]
 
 ```javascript
@@ -220,7 +219,6 @@ e.preventDefault를 하지 않으면, action에 의해 다음 page로 넘어가�
   })
 </script>
 ```
-<br>
 <br>
 
 
@@ -249,7 +247,7 @@ ajax를 처음 접한 사람이라면, 수도코드를 작성하고 코드를 �
 ajax를 이용해서 서버랑 통신할 수 있게 한다.
 <br>
 
-** [show.erb] ** 
+**[ajax 추가: show.erb]** 
 
 ```javascript
 $.ajax({
@@ -258,44 +256,24 @@ $.ajax({
       })
 ```
 
-1. 이렇게만 하면 missing templete에러가 발생한다. 
-2. 500에러
-3. 원래는 서버랑 통신을 하지 않고 있어서, error가 나지 않았지만, ajax를 사용하여 서버랑 통신을 연결하면서 error가 발생하게 된다.
-  <br>
-  <br>
-  **<error>**
-```ruby
-500 (Internal Server Error)
+1. 이렇게만 하면 페이지는 넘어가지는 않지만, 콘솔창에는 500eroor, missing templete에러가 발생한다.<br>
+
+**[error]**
+
 ```
-
-```ruby
-Post Load (0.1ms)  SELECT  "posts".* FROM "posts" WHERE "posts"."id" = ? LIMIT 1  [["id", 1]]
-  Rendered posts/show.html.erb within layouts/application (1.5ms)
-Completed 200 OK in 22ms (Views: 20.5ms | ActiveRecord: 0.1ms)
-
-
-Started GET "/posts/1" for 203.246.196.65 at 2017-11-28 01:43:34 +0000
-Cannot render console from 203.246.196.65! Allowed networks: 127.0.0.1, ::1, 127.0.0.0/127.255.255.255
-Processing by PostsController#show as HTML
-  Parameters: {"id"=>"1"}
-  Post Load (0.2ms)  SELECT  "posts".* FROM "posts" WHERE "posts"."id" = ? LIMIT 1  [["id", 1]]
-  Rendered posts/show.html.erb within layouts/application (2.2ms)
-Completed 200 OK in 24ms (Views: 23.0ms | ActiveRecord: 0.2ms)
-
-
-Started POST "/posts/1/create_comment" for 203.246.196.65 at 2017-11-28 01:43:38 +0000
-Cannot render console from 203.246.196.65! Allowed networks: 127.0.0.1, ::1, 127.0.0.0/127.255.255.255
-Processing by PostsController#create_comment as */*
-  Parameters: {"id"=>"1"}
-create_commnet
-Completed 500 Internal Server Error in 22ms (ActiveRecord: 0.0ms)
+Completed 500 Internal Server Error in 20ms (ActiveRecord: 0.0ms)
 
 ActionView::MissingTemplate
 ```
+2. 원래는 서버랑 통신을 하지 않고 있어서, error가 나지 않았지만, ajax를 사용하여 서버랑 통신을 연결하면서 error가 발생하게 된다.
+  <br>
+
 
 ### 2. 데이터 넘기기
-** show.erb ** 
-```ruby
+
+**[서버로 데이터 넘기기: show.erb]** 
+
+```javascript
       $.ajax({
         url: "<%=create_comment_to_post_path%>",
         method: "POST",
@@ -303,36 +281,69 @@ ActionView::MissingTemplate
       })
 ```
 
-**[posts_controller.rb]**
+**[서버로 데이터가 넘어왔는지 확인: posts_controller.rb]**
 ```ruby
   def create_comment
     puts params[:body]
   end
 ```
+파라미터가 두개가 넘어온다. <br>
+Parameters: {"body"=>"aa", "id"=>"1"}<br>
 
-### 3. templete missing
+### 3. ActionView::MissingTemplate
+
 create_comment.js.erb 를 만들어준다.
-** [view/posts/create_comment.js.erb] **
+
+**[새로 만들어주기: view/posts/create_comment.js.erb]**
 
 ```javascript
 # create_comment.js.erb
 alert("댓글이 등록됨");
 ```
+
+1. 댓글이 등록되었다는 알람창이 뜬다.
+2. Post Load가 이루어진다.
+
+```
+  Post Load (0.2ms)  SELECT  "posts".* FROM "posts" WHERE "posts"."id" = ? LIMIT 1  [["id", 1]]
+  Rendered posts/show.html.erb within layouts/application (1.3ms)
+Completed 200 OK in 38ms (Views: 36.6ms | ActiveRecord: 0.2ms)
+```
 <br>
-** [posts_controller.erb] **
+
+### 4. 데이터를 DB의 해당 row에 저장
+
+**[posts_controller.erb]**
+
+```ruby
+    @c = Post.find(params[:id]).comments.create(
+      body: params[:body]
+      )
+      
+# Comment.create(body: params[:body])
+      
+```
+
+rails/db를 확인하면 post id와 body값이 db에 들어오는 것을 확인할 수 있다. 
+단, Comment.create를 할 경우 post id는 저장되지 않으므로 주의!
+<br>
+<br>
+private활용
+
 ```ruby
 before_action :set_post, only: [:show, :edit, :update, :destroy, :create_comment]
 
   def create_comment
-    # puts params[:body]
-    @c = @post.commnets.create(body: params[:body]) # 와일드카드를 쓰고 있으므로 id도 같이 넘어온다. 
+    @c = @post.commnets.create(body: params[:body])
   end
 ```
+
 ### 4. javascript에서 페이지 넘기기
+
+로그인 한 유저만이 댓글을 쓰도록 하고 싶다. 따라서 로그인 안 한 유저는 로그인 페이지로 보낸다.
 
 ```ruby
   def create_comment
-    # puts params[:body]
     unless user_signed_in?
       respond_to do |format|
         format.js {render 'please_login.js.erb'}
