@@ -171,7 +171,7 @@ Completed 500 Internal Server Error in 9ms (ActiveRecord: 0.0ms)
 	(0) 현재 글을 
 3. 서버에서 처리가 완료되면 화면에 댓글을 출력한다. 
 
-* ajax => 서버랑 통신
+* show.erb => ajax => 서버랑 통신
 ```javascript
 $.ajax({
         url: "<%=create_comment_to_post_path%>",
@@ -263,10 +263,13 @@ before_action :set_post, only: [:show, :edit, :update, :destroy, :create_comment
     @c = @post.comments.create(body: params[:body]) # 와일드카드를 쓰고 있으므로 id도 같이 넘어온다. 
   end
 ```
+<br>
+
+
 * please_login.js.erb
 
 ```html
-if(confirm("로그인이 필요합니다. \n 로그인 페이졸 이동하시겠습니까?"))
+if(confirm("로그인이 필요합니다. \n 로그인 페이지로 이동하시겠습니까?"))
 location.href = "<%=new_user_session_path%>"
 ```
 
@@ -317,3 +320,16 @@ append | prepend
   </tbody>  
 ```
 <% @post.comments.each do |p|%> |  <% @post.comments.reverse.each do |p|%>
+
+## 4. 수도코드 
+### Q2. 댓글 구현하기(ajax를  통해서 )
+1. form태그 안에 input 태그 만들기
+2. submit 이벤트가 발생했을 경우에
+3. form태그 동작하지 않게 하기!
+4. input태그 안에 있는 값 가져오기
+	(1) 빈킨인 경우 알림주기
+5. jQuery ajax를 이용해서 원하는 url로 데이터 보내기
+	(1) 로그인하지 않은 경우 알림주기
+6. 서버에서 댓글 등록하기
+7. 댓글이 등록되었다고 알림주기
+8. 페이지 refresh 없이 댓글 이어주기
