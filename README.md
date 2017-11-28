@@ -1,26 +1,32 @@
 # jQuery & ajax on Rails
 
-# jQuery
+# jQuery?
 jQuery는 가볍고, DOM탐색이나 이벤트, 애니메이션, ajax등을 활용할 때 유용하게 사용할 수 있는 라이브러리이다.
 <br>
 
 **[javascript]**
+
 ```javascript
 document.getElementById("divId"); document.getElementsByClassName("className"); document.getElementsByTagName("input");
 ```
+
 <br>
+
 **[jQuery]**
 
 ```javascript
 $("#divId"); $(".className"); $("input");
 ```
 
-출처: [왜 jQuery를 사용하는가?](출처: http://unikys.tistory.com/300 [All-round programmer])
+출처: [왜 jQuery를 사용하는가?](http://unikys.tistory.com/300)
+
 <br>
+<br>
+
 jQeury사이트: [http://jquery.com/](http://jquery.com/)
 
 
-# 준비
+# [준비]
 Rails에서 jQuery와 ajax를 이용해 CRUD를 구현한다.
 
 ## CRUD 기본 설정
@@ -88,7 +94,7 @@ root 'posts#index'
 </div>
 ```
 
-# 구현
+# [구현]
 본격적으로 jQuery와 ajax를 이용하여 댓글달기 기능을 구현한다. 
 
 ## 댓글달기 기능
@@ -130,6 +136,7 @@ comment를 달 수 있는 창이 생겼다.
 ```
 rake routes 확인해 보면, creat_comment_to_post_path로 prefix가 만들어진것을 확인할 수 있다.<br> 
 <br>
+
 **Template is missing** => comment창을 확인하면, create_comment는 볼 수 있다. 
 <br>
 
@@ -193,7 +200,9 @@ e.preventDefault를 하지 않으면, action에 의해 다음 page로 넘어가�
   <br>
 
 ### 3. action이 다음페이지로 넘어가지 않고, console창에서 내용(value)확인
+
 **[e.preventDefault를 이용: show.erb]**
+
 <br>
 [form#comment, context: document, selector: "#comment"]
 
@@ -215,16 +224,18 @@ e.preventDefault를 하지 않으면, action에 의해 다음 page로 넘어가�
 <br>
 
 
-# 3. ajax
+# ajax?
+
 ajax는 page의 과부하를 주지않고, 작성할 수 있게 해준다. 
 <br>
 
-## 1. ajax 기본
+## 3. ajax 기본
 
 ajax를 처음 접한 사람이라면, 수도코드를 작성하고 코드를 짜나가는 것을 추천한다고 한다. 
 <br>
 
 ### Q1. 댓글 달기 + ajax로 구현하기
+--------------------------
 1. input태그에 값(댓글내용)을 입력한다. 
 * (0) submit 버튼을 클릭한다.(submit 이벤트 발생)
 * (1) input태그에 있는 값을 가져온다. 
@@ -235,15 +246,18 @@ ajax를 처음 접한 사람이라면, 수도코드를 작성하고 코드를 �
 3. 서버에서 처리가 완료되면 화면에 댓글을 출력한다. 
 
 ### 1. 서버와의 통신
-ajax => 서버랑 통신
+ajax를 이용해서 서버랑 통신할 수 있게 한다.
 <br>
+
 ** [show.erb] ** 
+
 ```javascript
 $.ajax({
         url: "<%=create_comment_to_post_path%>",
         method: "POST"
       })
 ```
+
 1. 이렇게만 하면 missing templete에러가 발생한다. 
 2. 500에러
 3. 원래는 서버랑 통신을 하지 않고 있어서, error가 나지 않았지만, ajax를 사용하여 서버랑 통신을 연결하면서 error가 발생하게 된다.
