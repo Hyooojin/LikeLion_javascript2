@@ -1,11 +1,11 @@
 class PostsController < ApplicationController
   before_action :set_post, only: [:show, :edit, :update, :destroy, :create_comment, :like_post]
-  before_action :is_login?, only: [:create_comment, :like_post]
+  before_action :is_login?, only: [:create_comment, :like_post, :destroy_comment]
 
   # GET /posts
   # GET /posts.json
   def index
-    @posts = Post.all
+    @posts = Post.order("created_at DESC").page(params[:page])
   end
 
   # GET /posts/1
@@ -95,8 +95,19 @@ class PostsController < ApplicationController
       @result = @result.frozen?
       puts @result
     end
-    
   end
+  
+  
+  def destroy_comment
+    @c = Comment.find(params[:comment_id]).destroy
+    puts @c.body
+  end
+  
+  
+  def page_scroll
+      @posts = Post.order("created_at DESC ").page(params[:page])
+  end
+  
 
   private
     # Use callbacks to share common setup or constraints between actions.

@@ -6,6 +6,10 @@ Rails.application.routes.draw do
       post '/create_comment' => 'posts#create_comment', as: 'create_comment_to'
       post '/like_post' => 'posts#like_post', as: 'like_to'
     end
+    collection do
+      delete '/:comment_id/destroy_comment'  => 'posts#destroy_comment', as: 'destroy_comment'
+      get '/page_scroll' => 'posts#page_scroll', as: 'scroll'
+    end
   end
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

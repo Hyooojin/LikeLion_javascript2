@@ -15,6 +15,7 @@
   <%=text_field_tag "comment[body]"%>
   <%=submit_tag "댓글달기"%>
 <% end %>
+<h3><span id="word_count">0</span><%= Comment.MAX_LENGTH%></h3>
 
 
 <%= link_to 'Edit', edit_post_path(@post), class: "btn btn-warning" %>
@@ -29,13 +30,15 @@
 <table class="table", id="comment_table">
   <thead>
       <tr>
-        <th>댓글</th>
+        <th class="text-center" width='90%'>댓글</th>
+        <th with="10%"></th>
       </tr>
   </thead>
   <tbody>
     <% @post.comments.reverse.each do |p|%>
-      <tr>
+      <tr id="comment-<%= p.id %>">
           <td><%= p.body %></td>
+          <td><%=link_to "삭제", destroy_comment_posts_path(p.id), method: :delete, data: {confirm: "삭제하시겠습니까?"}, class: "btn btn-warning", remote: true%></td>
       </tr>
     <% end %>
   </tbody>  
@@ -69,7 +72,26 @@
         data: contents
         // data: {body: contents}
       })
+      
     });
+    
+    var max_text_length = 50;
+     $('#comment').on('keyup', function() {
+       var text_length = $('#comment_body').val().length;
+      
+      $('#word_count').addClass('text-success').removeClass('text-danger');
+      // console.log(text_length);
+      if(text_length >= max_text_length) {
+        alert("최대 길이 넘음");
+        
+        $('#word_count').addClass('text-danger').removeClass('text-sucess');
+        $('#comment_body').val($('#comment_body').val().substr(0, max_text_length))
+        text_length = $('#comment_body').val().length;
+        
+      }
+       $('#word_count').text(text_length); 
+     })
+    
   })
 
   

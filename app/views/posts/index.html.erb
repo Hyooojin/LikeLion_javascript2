@@ -2,9 +2,10 @@
 
 <h1>Listing Posts</h1>
 
-<table>
+<table class="table" id="myTable">
   <thead>
     <tr>
+      <th>No.</th>
       <th>Title</th>
       <th>Content</th>
       <th colspan="3"></th>
@@ -14,8 +15,9 @@
   <tbody>
     <% @posts.each do |post| %>
       <tr>
+        <td><%= post.id %></td>
         <td><%= post.title %></td>
-        <td><%= post.content %></td>
+        <td><%= truncate post.content, length: 10 %></td>
         <td><%= link_to 'Show', post %></td>
         <td><%= link_to 'Edit', edit_post_path(post) %></td>
         <td><%= link_to 'Destroy', post, method: :delete, data: { confirm: 'Are you sure?' } %></td>
@@ -26,4 +28,26 @@
 
 <br>
 
-<%= link_to 'New Post', new_post_path %>
+
+<%= paginate @posts %>
+
+<script>
+$(function() {
+  var page_scroll_index = 2;
+    $(document).on('scroll', function() {
+      // console.log("움직인다다다다다");
+      //var end =
+      if($(window).scrollTop() >= $(document).height() - $(window).height()){
+        // console.log(end);
+        $.ajax({
+          method: "GET",
+          url: "<%= scroll_posts_path %>",
+          data: {
+            page: page_scroll_index++
+          }
+        });
+      }
+    });
+}); 
+</script>
+
