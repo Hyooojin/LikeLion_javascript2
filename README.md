@@ -651,10 +651,10 @@ like table에는 data가 추가된다.
 
 ```html
 <% if @like %>
-  <%= link_to "좋아요", like_post_to_post_path, id: "like_button", class: "btn btn-info" %>
+  <%= link_to "좋아요", like_to_post_path, id: "like_button", class: "btn btn-info" %>
   <%=@like%>
 <% else %>
-   <%= link_to "좋아요 취소", like_post_to_post_path, id: "like_button", class: "btn btn-danger" %>
+   <%= link_to "좋아요 취소", like_to_post_path, id: "like_button", class: "btn btn-danger" %>
   <%=@like%>
 <% end %>
 ```
