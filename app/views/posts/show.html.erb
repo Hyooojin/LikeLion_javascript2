@@ -20,11 +20,13 @@
 
 <%= link_to 'Edit', edit_post_path(@post), class: "btn btn-warning" %>
 <%= link_to 'Back', posts_path, class: "btn btn-success" %>
+
 <% if @like %>
   <%=link_to "Like", like_to_post_path, class: "btn btn-info", id: "like_button" %>
 <% else %>
   <%=link_to "DisLike", like_to_post_path, class: "btn btn-danger", id: "like_button" %>
 <% end %>
+
 <span id='like_count'><%=@post.likes.count%></span>
 
 <table class="table", id="comment_table">
