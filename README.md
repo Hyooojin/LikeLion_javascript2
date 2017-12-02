@@ -143,9 +143,11 @@ rake routes 확인해 보면, creat_comment_to_post_path로 prefix가 만들어�
 <br>
 
 <br>
+
 ### 3. Template error를 jQuery와 ajax로 차근차근 고쳐나가기
 <br>
 <br>
+
 **[error]**
 
 ```
@@ -246,15 +248,15 @@ ajax를 처음 접한 사람이라면, 수도코드를 작성하고 코드를 �
 
 ### Q1. 댓글 달기 + ajax로 구현하기
 --------------------------
-1. input태그에 값(댓글내용)을 입력한다. 
-* (0) submit 버튼을 클릭한다.(submit 이벤트 발생)
-* (1) input태그에 있는 값을 가져온다. 
-* (2) 값이 유효한지 확인한다. (빈칸인지 아닌지)
-* (3) 값이 없으면 값을 넣으라는 안내메시지를 뿌린다. 
-2. 값이 있을 경우, ajax로 처리한다. 
-* (1) 현재 글은 어디인지, 작성자는 누구인지 파악한다.
-* (2) DB에 댓글을 저장한다.
-3. 서버에서 처리가 완료되면 화면에 댓글을 출력한다. 
+* 1. input태그에 값(댓글내용)을 입력한다. 
+  * (0) submit 버튼을 클릭한다.(submit 이벤트 발생)
+  * (1) input태그에 있는 값을 가져온다. 
+  * (2) 값이 유효한지 확인한다. (빈칸인지 아닌지)
+  * (3) 값이 없으면 값을 넣으라는 안내메시지를 뿌린다. 
+* 2. 값이 있을 경우, ajax로 처리한다. 
+  * (1) 현재 글은 어디인지, 작성자는 누구인지 파악한다.
+  * (2) DB에 댓글을 저장한다.
+* 3. 서버에서 처리가 완료되면 화면에 댓글을 출력한다. 
 
 ### 1. 서버와의 통신
 ajax를 이용해서 서버랑 통신할 수 있게 한다.
@@ -269,7 +271,7 @@ $.ajax({
       })
 ```
 
-1. 이렇게만 하면 페이지는 넘어가지는 않지만, 콘솔창에는 500eroor, missing templete에러가 발생한다.<br>
+이렇게만 하면 페이지는 넘어가지는 않지만, 콘솔창에는 500eroor, missing templete에러가 발생한다.<br>
 
 **[error]**
 
@@ -278,7 +280,7 @@ Completed 500 Internal Server Error in 20ms (ActiveRecord: 0.0ms)
 
 ActionView::MissingTemplate
 ```
-2. 원래는 서버랑 통신을 하지 않고 있어서, error가 나지 않았지만, ajax를 사용하여 서버랑 통신을 연결하면서 error가 발생하게 된다.
+원래는 서버랑 통신을 하지 않고 있어서, error가 나지 않았지만, ajax를 사용하여 서버랑 통신을 연결하면서 error가 발생하게 된다.
   <br>
 
 
@@ -444,16 +446,16 @@ append | prepend <br>
 
 ### 6. ajax를 위한 수도코드
 ### Q2. 댓글 구현하기(ajax를  통해서 )
-1. form태그 안에 input 태그 만들기
-2. submit 이벤트가 발생했을 경우에
-3. form태그 동작하지 않게 하기!
-4. input태그 안에 있는 값 가져오기
-* (1) 빈킨인 경우 알림주기
-5. jQuery ajax를 이용해서 원하는 url로 데이터 보내기
-* (1) 로그인하지 않은 경우 알림주기
-6. 서버에서 댓글 등록하기
-7. 댓글이 등록되었다고 알림주기
-8. 페이지 refresh 없이 댓글 이어주기
+* 1. form태그 안에 input 태그 만들기
+* 2. submit 이벤트가 발생했을 경우에
+* 3. form태그 동작하지 않게 하기!
+* 4. input태그 안에 있는 값 가져오기
+  * (1) 빈킨인 경우 알림주기
+* 5. jQuery ajax를 이용해서 원하는 url로 데이터 보내기
+  * (1) 로그인하지 않은 경우 알림주기
+* 6. 서버에서 댓글 등록하기
+* 7. 댓글이 등록되었다고 알림주기
+* 8. 페이지 refresh 없이 댓글 이어주기
 
 
 # 좋아요 기능
@@ -497,7 +499,7 @@ url을 설정해 주기 위해서는 routing 설정이 필요!
 **[like_to의 prefix 설정: routes.rb]**
 
 ```ruby
- post '/like_post' => 'posts#like_post', as: 'like_to'
+ post '/like_post' => 'posts#like_post', as: 'like_post_to'
 ```
 <br>
 
@@ -551,6 +553,7 @@ Server 콘솔창에 Like Post Sucess가 뜨는 것을 확인할 수 있다. <br>
 ActionView::MissingTemplate
 
 <br>
+
 ### 3. missing template 처리
 
 **[새로만들기: like_post.js.erb]**
@@ -560,16 +563,19 @@ alert("좋아요를 눌렀습니다.")
 ```
 
 <br>
+
 ## 4.좋아요에 대한 정보를Database에 저장한다. 
 좋아요 / 좋아요 취소를 나타낼 수 있다. 
 <br>
 DB에도 해당 유저가 해당 post에 대해새 좋아요를 눌렀는가에 대한 data를 저장하려고 한다. 
 
 <br>
+
 ### 1. 좋아요 모델 만들기
 좋아요 정보는 어떤 유저가 어떤 post에 좋아요를 눌렀는지 저장하기 위함이기때문에 유저정보와 post정보를 지녀야 한다. 
 
 <br>
+
 **[Like 모델 만들기]**
 
 ```ruby
@@ -577,6 +583,7 @@ $ rails g model Like user:references post:references
 ```
 
 <br>
+
 ### 2. 모델의 관계 설정
 
 ```ruby
@@ -594,6 +601,7 @@ has_many :likes
 어떤 상황에 Database에 정보를 쌓을지를 지정한다. 
 
 <br>
+
 **[상황 설정: posts_controller.rb]**
 
 ```ruby
@@ -621,6 +629,7 @@ end
 2. 상황설정 [1] : Like 모델
 * user id값과 post id 값을 둘다 가지고 있는 row와 user id값과 post id 값이 없는 row.
 <br>
+
 * 로그인한 유저가 Like를 누르면 해당 post_id를 가지고, Like table에는 data가 추가된다.
 
 3. if Like.where(user_id, post_id).first.nil? **(true)**
@@ -658,6 +667,7 @@ like table에는 data가 추가된다.
   <%=@like%>
 <% end %>
 ```
+
 1. user가 로그인한 뒤, post에 like를 누를경우, Like table에는 정보가 저장되고, F5를 누르면, 좋아요 취소로 버튼이 바뀐다. 
 <br> 
 2. @like에 true가 담겨있는경우, 좋아요 버튼 <br>
@@ -674,6 +684,7 @@ dislike버튼을 누르면, table의 정보는 사라지고, F5를 누르면 좋
 ### 1. 좋아요 / 좋아요 취소를 true/false로 구분하여 @result에는 true일때 false일 때 다른 값들이 저장된다는 것을 이용.
 
 <br>
+
 **[@result.frozen의 변화: posts_controller#like_post]**
 
 ```ruby
@@ -684,14 +695,13 @@ dislike버튼을 누르면, table의 정보는 사라지고, F5를 누르면 좋
 1. @result에 create정보가 저장되었을 경우, <br> 
 @result.frozen? 은 false
 2. @result에 destroy정보가 저장되었을 경우, <br>
-@resuslt.frozen?은 true
-<br>
+@resuslt.frozen?은 true <br>
 3. frozen을 활용하여 일어난 이벤트에 대한 구분을 해 준다. 
 @result.frozen? True -> 얼어있다 <br>
 "dislik"가 눌린 상태 -> 버튼은 Like로 바뀐다.
 <br>
 
-**.frozen?**
+> **frozen이란? .frozen?** <br>
 > ORM 객체 == DB Row
 > Like.create => DH Row ++ ;
 > like.destroy => DB Row -- ;
@@ -717,6 +727,8 @@ $('#like_count').text(<%=@post.likes.count%>);
 2. @result가 false일 경우, table의 row에는 새로운 정보가 추가되었다. <br>
 즉, 새로운 User가 새로운 post에 "Like"를 누르는 이벤트가 발생되었다. <br>
 Like를 누르면서, button은 dislike로 바뀌게 된다. 
+<br>
+
 
 ### 2. User가 로그인 했을 경우만 좋아요/좋아요 취소를 할 수 있도록 한다. 
 
@@ -737,5 +749,7 @@ facebook을 ajax로 모두 짠다면, 그래도 굉장한 server에 과부하를
 * facebook은 server단을 단계별로 구분해 놓았다. 
 * 좋아요의 정보가 DB에 저장되지 않는다. 
 React: [https://reactjs.org/](https://reactjs.org/)
+
+<br>
 
 ### 삭제 버튼을 한번 구현해보자! 
