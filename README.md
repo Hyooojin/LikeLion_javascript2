@@ -21,7 +21,6 @@ $("#divId"); $(".className"); $("input");
 출처: [왜 jQuery를 사용하는가?](http://unikys.tistory.com/300)
 
 <br>
-<br>
 
 jQeury사이트: [http://jquery.com/](http://jquery.com/)
 
@@ -753,3 +752,430 @@ React: [https://reactjs.org/](https://reactjs.org/)
 <br>
 
 ### 삭제 버튼을 한번 구현해보자! 
+
+
+
+-------------------------------------------
+고치는 중! 
+-------------------------------------------
+**[resources :posts]**
+
+- /posts/:id
+- /posts/:id/edit
+
+member do
+- /posts/:id/{내가 설정한 url(메소드)} 
+이런식으로 url을 구성할 수 있다. 
+id를 직접 넣지 않아도 된다. 
+
+collection do
+- /posts/{내가 설정한 url}
+우리가 직접 설정해 주어야 한다. 
+
+
+
+# Ajax upgrade!! 
+아직 고치는중! 
+
+# Ajax2
+infinite scroll & Number of letters
+
+# infinite scroll 기능 
+ajax로 infinite scroll 구현하기
+
+## 1. inifnite scroll 기본
+
+### 1. pagination을 활용하기 위한 gem을 추가. 
+
+**[pagination: gemfile 설정]**
+
+```ruby
+gem 'kaminari'
+
+$ bundle install
+```
+<br>
+
+### 2. view단에 쓸수 있도록..  
+
+**[pagination 추가: index.html.erb]**
+
+```ruby
+<%= paginate @posts %>
+```
+<br>
+
+
+## 2. jQuery 작성
+
+### 1. 스크롤 이벤트를 console 창에서 확인
+
+**[scroll 기능을 구현 :  index.html.erb ]**
+
+```ruby
+<script>
+$(function() {
+    $(document).on('scroll', fonction() {
+      console.log("스크롤이 움직인다.");
+    })
+}) 
+</script>
+```
+
+<br>
+
+### 2. page 파라미터에 번호 매기기
+
+**[scroll 기능을 구현 :  index.html.erb ]**
+
+```ruby
+<script>
+$(function() {
+  var page_scroll_index = 1;
+    $(document).on('scroll', fonction() {
+      console.log("움직인다다다다다");
+    });
+}); 
+</script>
+```
+
+
+## 3. 한페이지에서 스크롤이 끝났을 경우, 계속 되도록, 알고리즘 
+
+<br>
+
+### 1. 페이지의 끝을 알 수 있어야 한다. 
+
+브라우저 콘솔창에서 확인해 보기 
+
+```html
+$(window).height();
+509
+# 브라우저
+
+$(document).height();
+509
+
+$(window).scrollTop();
+0
+```
+* $(window).height();
+* $(document).height();
+* $(window).scrollTop();
+
+> 다이나믹하게 변하는 것 2개와 고정된 것이  하나가 있다. **document**는 우리가 받아 온 전체 html 문서이고, **window**는 우리가 보고 있는 창을 말한다. 
+> 즉, 우리가 실제로 볼 수 있는 창이 window.height이고 ,document.height는 처음부터 끝까지 높이라고 할 수 있다. 
+<br>
+
+### 2. 페이지의 끝을 알 수 있는 알고리즘 구현
+
+**[index.html.erb]**
+
+```js
+$(window).scrollTop() >= $(document).height() - $(window).height();
+```
+
+```js
+$(function() {
+  var page_scroll_index = 2;
+  $(document).on('scroll', function() {
+    var end = $(window).scrollTop() >= $(documnet).height() - $ $(window).height();
+    console.log(end);
+  })
+})
+```
+
+<br>
+
+### 3. 
+
+
+1. true가 나왔을때만!
+2. if 조건문 안에 넣어준다. 
+3. ajax로 보내준다. 
+
+<table>
+
+	<th></th>
+</table>
+
+
+
+```js
+<script>
+$(function() {
+  var page_scroll_index = 1;
+    $(document).on('scroll', function() {
+      // console.log("움직인다다다다다");
+      //var end =
+      if($(window).scrollTop() >= $(document).height() - $(window).height()){
+        // console.log(end);
+        $.ajax({
+          method: "GET",
+          url: "<%= scroll_posts_path %>"
+        });
+      }
+    });
+}); 
+</script>
+```
+
+
+
+```ruby
+ def page_scroll
+    puts "haha"
+  end
+```
+
+
+
+
+
+
+
+
+
+page scoll
+
+1. index에서 id를 찾는다. 
+2. 아무 에러가 안나면 javascript파일을 확인, 500에러면 ruby코드
+
+
+
+
+
+### 1.2.3.4.5.6.
+
+1. ofset을 늘려줘야 하낟. 
+
+2. 강제로 늘려주기
+
+```js
+$.ajax({
+method: "GET",
+url: "<%= scroll_posts_path %>",
+data: {
+page: page_scroll_index
+```
+
+3. pge라는 파라미터가 넘어온다. 
+4. 계속 번호가 이어지게 하기위해서는 
+
+5. page 처음은 1이니까 그에 상응하는 page로 맞춰준다. 
+
+```js
+page: page_scroll_index++
+
+#고쳐주기
+var page_scroll_index = 2;
+```
+
+
+
+### 새글을 작성하는데 순서를 바꾸기
+
+**[posts_controller.rb]**
+
+```ruby
+# #index, #page_scroll
+@posts = Post.order("created_at DESC ").page(params[:page])
+```
+
+
+
+### default 값을 늘리기
+
+1pxel만 있어도 스크롤이 있다고 생각, 40개씩 보여지도록 한다. 
+
+**해결 1. [post.rb]**
+
+```ruby
+paginates_per 40
+```
+
+kaminari에 있는 method이므로, kaminari의 옵션이다. 
+
+<br>
+
+**해결 2. [사이즈 강제로 늘리기]**
+
+
+
+### response로 오는 코드 바꾸기
+
+```js
+alert("스크롤 무한스크롤 ㅋㅋㅋ");
+
+     $('#myTable tbody').append(
+     `
+     <% @posts.each do |post| %>
+     <tr>
+         <td><%= post.id %></td>
+         <td><%= post.title %></td>
+         <td><%= truncate post.content, length: 10 %></td>
+         <td><%= link_to 'Show', post %></td>
+         <td><%= link_to 'Edit', edit_post_path(post) %></td>
+         <td><%= link_to 'Destroy', post, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+     </tr>
+     <% end %>
+     `);   
+```
+method를 부르는 횟수를 줄이는 것이 좋다. !! <br>
+40개의 테이블을 만들어 놓고 붙이는 형식으로 진행된다. 
+
+
+# validation => model 자체에서 구현가능
+# text_area_field에 글자수 제한하기
+# asset pipeline => bootstrap thema 사용하기
+jQuery는 가볍고, DOM탐색이나 이벤트, 애니메이션, ajax등을 활용할 때 유용하게 사용할 수 있는 라이브러리이다.
+<br>
+
+**[javascript]**
+
+```javascript
+document.getElementById("divId"); document.getElementsByClassName("className"); document.getElementsByTagName("input");
+```
+
+<br>
+
+
+# Number of letters
+## validation 
+
+# 댓글에 validation 기능
+
+validation(유효성 검사) <br>
+우리가 원하는 길이인가? (최소, 최대) <br>
+우리가 원하는 형태인가? <br>
+<br>
+
+Validation이라는 것은 front, server 둘다에서 작성해야 한다. <br> 
+front end에서 길이를 확인<br>
+back end에서는 유효성 검사
+
+## 1. Front: 댓글에 validation 주기
+### 1.  댓글에 validation 주기
+
+**[show.erb]**
+
+```js
+     $('#comment').on('keypress', function() {
+       console.log("hahaha");
+     })
+```
+* keyboard event 
+  [https://api.jquery.com/category/events/keyboard-events/](https://api.jquery.com/category/events/keyboard-events/)
+
+keypress는 문자가 추가될 때마다, keydown(), keyup() <br>
+키보드에서 손을 떼었을때 event가 발생하는 것으로 사용
+<br>
+
+`#comment`는 form에 달려있는 아이지 input에 달려 있는 아이가 아니다. 
+
+
+### 2. keypress, keyup
+```js
+     $('#comment').on('keyup', function() {
+       var com = $('#comment_body').val();
+       console.log(com);
+     })
+```
+keypress는 나중에 찍히고, keyup은 눌렀다가 떼는 순간 event가 발생한다. 
+
+### 3. 글자하나씩 count하기 
+
+```js
+     $('#comment').on('keyup', function() {
+       var text_length = $('#comment_body').val().length;
+       console.log(text_length);
+       
+     })
+```
+
+### 4. 전체글자수 .. 현재 글자수 나타내기 
+
+```html
+<h3><span id="word_count">0</span>/50</h3>
+```
+
+### 5. 0을 현재 글자수로 바꾸기 
+
+```js
+    $('#word_count').text(text_length);    
+```
+
+### 6. word count가 늘어나는 것을 막기
+this가 바인딩 되는 곳
+```ruby
+    var max_text_length = 50;
+     $('#comment').on('keyup', function() {
+       var text_length = $('#comment_body').val().length;
+      $('#word_count').text(text_length);      
+      // console.log(text_length);
+      if(내가 입력한 텍스트의 길이가 최대 길이를 넘으면) {
+        alert("최대 길이 넘음");
+      }
+       
+     })
+```
+1. 길이가 넘으면 지워준다. 
+2. 기존의 `comment_body`로 바꾼다. 
+3. substring method
+
+[W3school](https://www.w3schools.com/jsref/jsref_substr.asp)
+
+```js
+    var max_text_length = 50;
+     $('#comment').on('keyup', function() {
+       var text_length = $('#comment_body').val().length;
+      
+      $('#word_count').addClass('text-success').removeClass('text-danger');
+      // console.log(text_length);
+      if(text_length >= max_text_length) {
+        alert("최대 길이 넘음");
+        
+        $('#word_count').addClass('text-danger').removeClass('text-sucess');
+        $('#comment_body').val($('#comment_body').val().substr(0, max_text_length))
+        text_length = $('#comment_body').val().length;
+        
+      }
+       $('#word_count').text(text_length); 
+     })
+```
+
+
+## 2. Back: 댓글에 validation 주기
+### 1.  댓글에 validation 주기
+코멘트를 입력하는것이 :body로 되어 있다. 
+**[comment.rb]**
+```ruby
+  validates :body, length: {maximum: 40},
+                    presence: true
+```
+프론트에서는 50자 제한
+백에서는 40자 제한.
+
+### 2. 백엔드에서 길이가 기억안나면 
+
+```ruby
+class Comment < ActiveRecord::Base
+    
+    def self.MAX_LENGTH
+         40 
+    end
+    
+    
+  belongs_to :post
+  validates :body, length: {maximum: self.MAX_LENGTH},
+                    presence: true
+                    
+
+  
+end
+```
+
+# text_area_field 글자수 제한
+## 1.  
+### 1. 
+
